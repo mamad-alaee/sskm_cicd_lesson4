@@ -1,39 +1,53 @@
 name: CI
 
 on:
-    workflow_dispatch:
-    push:
-        branches: [ main ]
+  workflow_dispatch:
+  push:
+    branches: [main]
 
 jobs:
-    test_project:
-        runs-on: ubuntu-latest
-        steps:
-        - uses: actions/checkout@v3
-        - name: Set up Python 3.9
-          uses: actions/setup-python@v3
-          with:
-            python-version: 3.9
-        - name: Install dependencies
-          run: |
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-        - name: Test with pytest
-          run: |
-            pytest -v
-    run_project:
-        needs: test_project
-        runs-on: ubuntu-latest
-        steps:
-        - uses: actions/checkout@v3
-        - name: Set up Python 3.9
-          uses: actions/setup-python@v3
-          with:
-            python-version: 3.9
-        - name: Install dependencies
-          run: |
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-        - name: Run the project
-          run: |
-            echo "Running the project..."
+  test_project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Test with pytest
+        run: |
+          pytest -v
+      - name: Upload Report Txt
+        uses: actions/upload-artifact@v3
+        with:
+          name: Report_Of_Test
+          path: report.txt
+  run_project:
+    needs: test_project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run the project
+        run: |
+          echo "Running the project..."
+
+  show_report:
+    needs: test_project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Report Txt
+        uses: actions/download-artifact@v3
+        with:
+          name: Report_Of_Test
